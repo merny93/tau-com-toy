@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package validate.example;
+
+import "validate/validate.proto";
+
+import "google/protobuf/descriptor.proto";
+import "options.proto";
+
+message ExampleMessage {
+  string content = 1 [(validate.rules).string = {const: "Hello, world!"},(options.meta) = { isFact: false }];
+}
