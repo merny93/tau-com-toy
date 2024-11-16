@@ -11,18 +11,21 @@ from google.protobuf import symbol_database as _symbol_database
 _sym_db = _symbol_database.Default()
 
 
+from validate import validate_pb2 as validate_dot_validate__pb2
 import substate_pb2 as substate__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0bstate.proto\x12\x05state\x1a\x0esubstate.proto\"\xa4\x01\n\x05State\x12+\n\x08internal\x18\x01 \x01(\x0b\x32\x14.state.StateInternalH\x00\x88\x01\x01\x12\'\n\tinherited\x18\x02 \x01(\x0b\x32\x0f.substate.StateH\x01\x88\x01\x01\x12\x19\n\x0cglobal_param\x18\x03 \x01(\rH\x02\x88\x01\x01\x42\x0b\n\t_internalB\x0c\n\n_inheritedB\x0f\n\r_global_param\"\x1f\n\rStateInternal\x12\x0e\n\x06param1\x18\x01 \x01(\rb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0bstate.proto\x12\x05state\x1a\x17validate/validate.proto\x1a\x0esubstate.proto\"\xa4\x01\n\x05State\x12+\n\x08internal\x18\x01 \x01(\x0b\x32\x14.state.StateInternalH\x00\x88\x01\x01\x12\'\n\tinherited\x18\x02 \x01(\x0b\x32\x0f.substate.StateH\x01\x88\x01\x01\x12\x19\n\x0cglobal_param\x18\x03 \x01(\rH\x02\x88\x01\x01\x42\x0b\n\t_internalB\x0c\n\n_inheritedB\x0f\n\r_global_param\"(\n\rStateInternal\x12\x17\n\x06param1\x18\x01 \x01(\rB\x07\xfa\x42\x04*\x02\x18\nb\x06proto3')
 
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, globals())
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'state_pb2', globals())
 if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
-  _STATE._serialized_start=39
-  _STATE._serialized_end=203
-  _STATEINTERNAL._serialized_start=205
-  _STATEINTERNAL._serialized_end=236
+  _STATEINTERNAL.fields_by_name['param1']._options = None
+  _STATEINTERNAL.fields_by_name['param1']._serialized_options = b'\372B\004*\002\030\n'
+  _STATE._serialized_start=64
+  _STATE._serialized_end=228
+  _STATEINTERNAL._serialized_start=230
+  _STATEINTERNAL._serialized_end=270
 # @@protoc_insertion_point(module_scope)
