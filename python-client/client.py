@@ -1,6 +1,13 @@
+'''
+Compile protos as
+protoc --python_out=. -I=../ -I=../validate -I=../meta ../state.proto ../substate.proto ../validate/validate.proto ../meta/meta.proto 
+
+'''
+
 import socket
 import state_pb2 
 import substate_pb2
+import meta.meta_pb2 as meta_pb2
 from protoc_gen_validate.validator import ValidationFailed, validate_all
 
 def send_message(socket_path):
@@ -32,6 +39,9 @@ def send_message(socket_path):
 
 # Example usage
 if __name__ == "__main__":
-    
+    #meta data can be obtained as
+
+    for i in state_pb2.StateInternal.DESCRIPTOR.fields:
+        print(f" field {i.full_name} has meta {i.GetOptions().Extensions[meta_pb2.meta]}")
     # print(command)
     send_message('../command_socket')

@@ -1,0 +1,17 @@
+syntax = "proto2";
+package meta;
+
+
+import "google/protobuf/descriptor.proto";
+message Meta {
+    optional string name = 1;
+    optional string description = 2;
+}
+
+extend google.protobuf.FieldOptions {
+  optional Meta meta = 80412; // numbering: search for "One last thing" in the link above
+}
+
+// extend google.protobuf.MessageOptions{
+//     optional Meta meta = 80412;
+// }
