@@ -1,6 +1,6 @@
 syntax = "proto3";
 package state;
-// import "validate/validate.proto";
+import "validate/validate.proto";
 
 import "substate.proto";
 
@@ -12,6 +12,5 @@ message State {
 }
 
 message StateInternal {
-  uint32 param1 = 1;
-  
+  uint32 param1 = 1 [(validate.rules).uint32 = {lte: 10}];
 }

@@ -68,6 +68,16 @@ fn main() {
 
                 //which can be inspected on the payload
                 let recieved = state::State::decode(&buf[..]).unwrap();
+                // assert!(recieved.validate().is_ok());
+                match recieved.validate() {
+                    Ok(_) => {
+                        println!("Validation passed");
+                    }
+                    Err(err) => {
+                        eprintln!("Validation failed: {}", err);
+                        continue;
+                    }
+                }
                 // this can be logged ofc, and validated (see prost_validate)
                 println!("Diffs using proc macro seen here: {}", recieved.pretty_print());
                 //and it can be applied

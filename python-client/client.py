@@ -11,6 +11,9 @@ def send_message(socket_path):
         substate = substate_pb2.State()
         substate.param1 = 37
         substate.print_param1= True
+        internal = state_pb2.StateInternal()
+        internal.param1 = 40
+        command.internal.CopyFrom(internal)
         # command.inherited.CopyFrom(substate)
         command.global_param = 3
         # # Serialize the message to a binary format
