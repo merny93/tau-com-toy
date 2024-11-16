@@ -22,7 +22,7 @@ def send_message(socket_path):
         substate.print_param1= True
         internal = state_pb2.StateInternal()
         internal.param1 = 40
-        command.internal.CopyFrom(internal)
+        # command.internal.CopyFrom(internal)
         # command.inherited.CopyFrom(substate)
         command.global_param = 3
         try:
@@ -42,6 +42,7 @@ if __name__ == "__main__":
     #meta data can be obtained as
 
     for i in state_pb2.StateInternal.DESCRIPTOR.fields:
-        print(f" field {i.full_name} has meta {i.GetOptions().Extensions[meta_pb2.meta]}")
+        print(f"field {i.full_name} has meta {i.GetOptions().Extensions[meta_pb2.field_data]}".strip())
+    print(f"message meta {state_pb2.StateInternal.DESCRIPTOR.GetOptions().Extensions[meta_pb2.message_data]}".strip())
     # print(command)
     send_message('../command_socket')

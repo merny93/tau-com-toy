@@ -9,9 +9,9 @@ message Meta {
 }
 
 extend google.protobuf.FieldOptions {
-  optional Meta meta = 80412; // numbering: search for "One last thing" in the link above
+  optional Meta field_data = 80412; // numbering: search for "One last thing" in the link above
 }
 
-// extend google.protobuf.MessageOptions{
-//     optional Meta meta = 80412;
-// }
+extend google.protobuf.MessageOptions{
+  optional Meta message_data = 80412;
+}

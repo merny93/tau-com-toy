@@ -14,12 +14,13 @@ _sym_db = _symbol_database.Default()
 from google.protobuf import descriptor_pb2 as google_dot_protobuf_dot_descriptor__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0fmeta/meta.proto\x12\x04meta\x1a google/protobuf/descriptor.proto\")\n\x04Meta\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x02 \x01(\t:9\n\x04meta\x12\x1d.google.protobuf.FieldOptions\x18\x9c\xf4\x04 \x01(\x0b\x32\n.meta.Meta')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0fmeta/meta.proto\x12\x04meta\x1a google/protobuf/descriptor.proto\")\n\x04Meta\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x02 \x01(\t:?\n\nfield_data\x12\x1d.google.protobuf.FieldOptions\x18\x9c\xf4\x04 \x01(\x0b\x32\n.meta.Meta:C\n\x0cmessage_data\x12\x1f.google.protobuf.MessageOptions\x18\x9c\xf4\x04 \x01(\x0b\x32\n.meta.Meta')
 
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, globals())
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'meta.meta_pb2', globals())
 if _descriptor._USE_C_DESCRIPTORS == False:
-  google_dot_protobuf_dot_descriptor__pb2.FieldOptions.RegisterExtension(meta)
+  google_dot_protobuf_dot_descriptor__pb2.FieldOptions.RegisterExtension(field_data)
+  google_dot_protobuf_dot_descriptor__pb2.MessageOptions.RegisterExtension(message_data)
 
   DESCRIPTOR._options = None
   _META._serialized_start=59

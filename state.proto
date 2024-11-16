@@ -12,5 +12,6 @@ message State {
 }
 
 message StateInternal {
-  uint32 param1 = 1 [(validate.rules).uint32 = {lte: 10}, (meta.meta) = {name: "hello"}];
+  option (meta.message_data) = {name: "StateInternal", description: "This is the internal state"};
+  uint32 param1 = 1 [(validate.rules).uint32 = {lte: 10}, (meta.field_data) = {name: "hello"}];
 }
