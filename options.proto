@@ -1,9 +1,0 @@
-syntax = "proto2";
-import "google/protobuf/descriptor.proto";
-package options;
-message MyMeta {
-  optional bool isFact = 1;
-}
-extend google.protobuf.FieldOptions {
-  optional MyMeta meta = 80412; // numbering: search for "One last thing" in the link above
-}

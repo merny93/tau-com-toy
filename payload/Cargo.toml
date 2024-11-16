@@ -7,13 +7,16 @@ edition = "2021"
 
 
 [dependencies]
-capnp = "0.20" # Note this is a different library than capnp*c*
+# capnp = "0.20" # Note this is a different library than capnp*c*
 prost = "0.13.3"
 prost-validate = { version = "0.2.6", features = ["derive"] }
+dif-print = { path = "../dif-print" }
+# prost-metadata = { path = "../prost-metadata" }
+# prost-metadata-macro = { path = "../prost-metadata-macro" }
 
 
 [build-dependencies]
-capnpc = "0.20"
+# capnpc = "0.20"
 prost-build = "0.13.3"
 prost-validate-build = "0.2.6"
-prost-metadata = {path = "../prost-metadata"}
+# prost-metadata-build = {path = "../prost-metadata-build"}

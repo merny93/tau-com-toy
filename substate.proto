@@ -1,0 +1,7 @@
+syntax = "proto3";
+package substate;
+
+message State {
+  optional uint32 param1 = 1;
+  optional bool print_param1 =2;
+}

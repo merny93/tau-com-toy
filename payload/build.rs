@@ -1,15 +1,13 @@
-extern crate capnpc;
 extern crate prost_build;
 extern crate prost_validate_build;
-extern crate prost_metadata;
+use std::env;
+use std::path::Path;
+
 fn main() {
-    capnpc::CompilerCommand::new()
-        .src_prefix("../")
-        .file("../commands.capnp")
-        .run()
-        .expect("schema compiler command");
-    prost_build::compile_protos(&["../commands.proto"], &["../"]).unwrap();
-    prost_metadata::Builder::new()
-        .compile_protos(&["../validate.proto"], &["../", "../validate"])
-        .unwrap();
+    let proto_file = "../state.proto";
+    println!("cargo:rerun-if-changed={}", proto_file);
+    let mut config = prost_build::Config::new();
+
+    config.message_attribute(".", "#[derive(::dif_print::PrettyPrint)]");
+    config.compile_protos(&[proto_file], &["../"]).unwrap();
 }

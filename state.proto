@@ -1,0 +1,17 @@
+syntax = "proto3";
+package state;
+// import "validate/validate.proto";
+
+import "substate.proto";
+
+message State {
+  optional StateInternal internal = 1;
+  optional substate.State inherited = 2;
+  optional uint32 global_param = 3;
+
+}
+
+message StateInternal {
+  uint32 param1 = 1;
+  
+}
