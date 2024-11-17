@@ -1,7 +1,15 @@
 syntax = "proto3";
 package substate;
 
-message State {
-  optional uint32 param1 = 1;
-  optional bool print_param1 =2;
+import "google/protobuf/empty.proto";
+
+message Fridge {
+  optional FridgeParams params = 1;
+  optional google.protobuf.Empty cycle =2;
+}
+
+message FridgeParams {
+  uint32 delay1 = 1;
+  uint32 delay2 = 2;
+  uint32 delay3 = 3;
 }

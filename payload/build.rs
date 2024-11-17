@@ -6,7 +6,7 @@ use std::path::Path;
 fn main() {
     let proto_file = "../state.proto";
     let includes = vec!["../", "../validate"];
-    println!("cargo:rerun-if-changed={}", proto_file);
+    println!("cargo:rerun-if-changed=../*.proto");
 
     let mut config = prost_build::Config::new();
 

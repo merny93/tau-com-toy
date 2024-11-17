@@ -17,14 +17,19 @@ def send_message(socket_path):
         s.connect(socket_path)
         
         command = state_pb2.State()
-        substate = substate_pb2.State()
-        substate.param1 = 37
-        substate.print_param1= True
-        internal = state_pb2.StateInternal()
-        internal.param1 = 40
+        fridge_state = substate_pb2.Fridge()
+        fridge_params = substate_pb2.FridgeParams()
+        fridge_params.delay1 = 10
+        fridge_params.delay2 = 1
+        fridge_params.delay3 = 1
+        # fridge_state.params.CopyFrom(fridge_params)
+        fridge_state.cycle.SetInParent()
+        # internal = state_pb2.StateInternal()
+        # internal.param1 = 40
         # command.internal.CopyFrom(internal)
         # command.inherited.CopyFrom(substate)
-        command.global_param = 3
+        # command.global_param = 3
+        command.fridge.CopyFrom(fridge_state)
         try:
             validate_all(command)
         except ValidationFailed as err:

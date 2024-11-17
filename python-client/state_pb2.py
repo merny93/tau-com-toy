@@ -16,7 +16,7 @@ from meta import meta_pb2 as meta_dot_meta__pb2
 import substate_pb2 as substate__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0bstate.proto\x12\x05state\x1a\x17validate/validate.proto\x1a\x0fmeta/meta.proto\x1a\x0esubstate.proto\"\xa4\x01\n\x05State\x12+\n\x08internal\x18\x01 \x01(\x0b\x32\x14.state.StateInternalH\x00\x88\x01\x01\x12\'\n\tinherited\x18\x02 \x01(\x0b\x32\x0f.substate.StateH\x01\x88\x01\x01\x12\x19\n\x0cglobal_param\x18\x03 \x01(\rH\x02\x88\x01\x01\x42\x0b\n\t_internalB\x0c\n\n_inheritedB\x0f\n\r_global_param\"d\n\rStateInternal\x12\"\n\x06param1\x18\x01 \x01(\rB\x12\xfa\x42\x04*\x02\x18\n\xe2\xa1\'\x07\n\x05hello:/\xe2\xa1\'+\n\rStateInternal\x12\x1aThis is the internal stateb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0bstate.proto\x12\x05state\x1a\x17validate/validate.proto\x1a\x0fmeta/meta.proto\x1a\x0esubstate.proto\"\x9f\x01\n\x05State\x12+\n\x08internal\x18\x01 \x01(\x0b\x32\x14.state.StateInternalH\x00\x88\x01\x01\x12%\n\x06\x66ridge\x18\x02 \x01(\x0b\x32\x10.substate.FridgeH\x01\x88\x01\x01\x12\x19\n\x0cglobal_param\x18\x03 \x01(\rH\x02\x88\x01\x01\x42\x0b\n\t_internalB\t\n\x07_fridgeB\x0f\n\r_global_param\"d\n\rStateInternal\x12\"\n\x06param1\x18\x01 \x01(\rB\x12\xfa\x42\x04*\x02\x18\n\xe2\xa1\'\x07\n\x05hello:/\xe2\xa1\'+\n\rStateInternal\x12\x1aThis is the internal stateb\x06proto3')
 
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, globals())
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'state_pb2', globals())
@@ -28,7 +28,7 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _STATEINTERNAL._options = None
   _STATEINTERNAL._serialized_options = b'\342\241\'+\n\rStateInternal\022\032This is the internal state'
   _STATE._serialized_start=81
-  _STATE._serialized_end=245
-  _STATEINTERNAL._serialized_start=247
-  _STATEINTERNAL._serialized_end=347
+  _STATE._serialized_end=240
+  _STATEINTERNAL._serialized_start=242
+  _STATEINTERNAL._serialized_end=342
 # @@protoc_insertion_point(module_scope)
