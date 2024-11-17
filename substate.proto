@@ -1,4 +1,4 @@
-syntax = "proto3";
+syntax = "proto2";
 package substate;
 
 import "google/protobuf/empty.proto";
@@ -9,7 +9,7 @@ message Fridge {
 }
 
 message FridgeParams {
-  uint32 delay1 = 1;
-  uint32 delay2 = 2;
-  uint32 delay3 = 3;
+  optional uint32 delay1 = 1;
+  optional uint32 delay2 = 2;
+  optional uint32 delay3 = 3;
 }
