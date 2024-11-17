@@ -12,6 +12,12 @@ mod state {
 mod substate {
     include!(concat!(env!("OUT_DIR"), "/substate.rs"));
 }
+mod combined {
+    include!(concat!(env!("OUT_DIR"), "/combined.rs"));
+}
+mod action {
+    include!(concat!(env!("OUT_DIR"), "/action.rs"));
+}
 
 trait DefaultRich {
     fn default_rich() -> Self;
@@ -46,7 +52,10 @@ fn main() {
     //this can be serialized efficiently and be sent down so that the ground knows the exact state of the payload
     let mut buf = Vec::new();
     actual.encode(&mut buf).unwrap();
-    println!("State can be shared from payload to ground seemlesly. Here it is encoded {:?}", buf);
+    println!(
+        "State can be shared from payload to ground seemlesly. Here it is encoded {:?}",
+        buf
+    );
 
     let socket_path: &str = "../command_socket";
     // let socket_path = "/tmp/command_socket";
@@ -56,7 +65,7 @@ fn main() {
     }
 
     let listener = UnixListener::bind(socket_path).unwrap();
-    println!("Listening on {}", socket_path);
+    println!("Listening on {}\n", socket_path);
 
     for stream in listener.incoming() {
         match stream {
@@ -67,22 +76,41 @@ fn main() {
                 println!("recieved command sent up the link {:?}", buf);
 
                 //which can be inspected on the payload
-                let recieved = state::State::decode(&buf[..]).unwrap();
+                let recieved = combined::CombinedMessage::decode(&buf[..]).unwrap();
                 // this can be logged ofc, and validated (see prost_validate)
-                println!("Diffs using proc macro seen here: {}", recieved.pretty_print());
-                //and it can be applied
-                actual.merge(&buf[..]).unwrap();
-                // yes i know this is silly as it is deserialized twice. but memory is cheap and so are cpu cycles
-                // this can be fixed with the merge crate!
+                println!("... decoded: {:?}", recieved);
+                match recieved.combined {
+                    Some(combined::combined_message::Combined::Action(act)) => {
+                        println!("... Received action message: {:?}", act);
+                        // logic for this action would go here
+                        // either directly, or queueing an async thing
+                    }
+                    Some(combined::combined_message::Combined::State(state)) => {
+                        println!("... Received state message: {:?}", state);
 
-                //finally the payload can act upon it. Either by passing it to the subsystems or by acting on it directly
-                // println!("State after command {:?}", actual);
-                actual.inherited = Some(inherited_task(actual.inherited.unwrap()));
+                        println!(
+                            "... Diffs using proc macro seen here: {}",
+                            recieved.pretty_print()
+                        );
+                        //and it can be applied
+                        // re-encoding here is maybe dumb, and if we want to go this route
+                        // we can find/make a less dumb way
+                        // but I guess if we were fine with decoding twice, and an extra encode is also fine
+                        actual.merge(&state.encode_to_vec()[..]).unwrap();
+                        // yes i know this is silly as it is deserialized twice. but memory is cheap and so are cpu cycles
+                        // this can be fixed with the merge crate!
+
+                        //finally the payload can act upon it. Either by passing it to the subsystems or by acting on it directly
+                        actual.inherited = Some(inherited_task(actual.inherited.unwrap()));
+                    }
+                    None => println!("Received no message"),
+                }
             }
             Err(err) => {
                 eprintln!("Error accepting connection: {}", err);
             }
         }
+        println!("State after command: {:?}\n", actual);
     }
 }
 

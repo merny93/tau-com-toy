@@ -1,0 +1,6 @@
+syntax = "proto3";
+package action;
+
+message ExampleAction {
+  // no fields because this is just a trigger
+}

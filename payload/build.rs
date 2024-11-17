@@ -4,7 +4,7 @@ use std::env;
 use std::path::Path;
 
 fn main() {
-    let proto_file = "../state.proto";
+    let proto_file = "../combined.proto";
     println!("cargo:rerun-if-changed={}", proto_file);
     let mut config = prost_build::Config::new();
 

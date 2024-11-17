@@ -1,0 +1,13 @@
+syntax = "proto3";
+package combined;
+
+import "state.proto";
+import "action.proto";
+
+// multiple different types of message can be sent by combining into a oneof
+message CombinedMessage {
+  oneof combined {
+    state.State state = 1;
+    action.ExampleAction action = 2;
+  }
+}
