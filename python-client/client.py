@@ -22,7 +22,7 @@ def send_message(socket_path):
         fridge_params.delay1 = 10
         fridge_params.delay2 = 1
         fridge_params.delay3 = 1
-        # fridge_state.params.CopyFrom(fridge_params)
+        fridge_state.params.CopyFrom(fridge_params)
         fridge_state.cycle.SetInParent()
         # internal = state_pb2.StateInternal()
         # internal.param1 = 40
