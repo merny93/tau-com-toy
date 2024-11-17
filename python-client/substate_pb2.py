@@ -14,7 +14,7 @@ _sym_db = _symbol_database.Default()
 from google.protobuf import empty_pb2 as google_dot_protobuf_dot_empty__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0esubstate.proto\x12\x08substate\x1a\x1bgoogle/protobuf/empty.proto\"u\n\x06\x46ridge\x12+\n\x06params\x18\x01 \x01(\x0b\x32\x16.substate.FridgeParamsH\x00\x88\x01\x01\x12)\n\x05\x63ycle\x18\x02 \x01(\x0b\x32\x15.substate.FridgeCycleH\x01\x88\x01\x01\x42\t\n\x07_paramsB\x08\n\x06_cycle\"\r\n\x0b\x46ridgeCycle\">\n\x0c\x46ridgeParams\x12\x0e\n\x06\x64\x65lay1\x18\x01 \x01(\r\x12\x0e\n\x06\x64\x65lay2\x18\x02 \x01(\r\x12\x0e\n\x06\x64\x65lay3\x18\x03 \x01(\rb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0esubstate.proto\x12\x08substate\x1a\x1bgoogle/protobuf/empty.proto\"v\n\x06\x46ridge\x12+\n\x06params\x18\x01 \x01(\x0b\x32\x16.substate.FridgeParamsH\x00\x88\x01\x01\x12*\n\x05\x63ycle\x18\x02 \x01(\x0b\x32\x16.google.protobuf.EmptyH\x01\x88\x01\x01\x42\t\n\x07_paramsB\x08\n\x06_cycle\">\n\x0c\x46ridgeParams\x12\x0e\n\x06\x64\x65lay1\x18\x01 \x01(\r\x12\x0e\n\x06\x64\x65lay2\x18\x02 \x01(\r\x12\x0e\n\x06\x64\x65lay3\x18\x03 \x01(\rb\x06proto3')
 
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, globals())
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'substate_pb2', globals())
@@ -22,9 +22,7 @@ if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
   _FRIDGE._serialized_start=57
-  _FRIDGE._serialized_end=174
-  _FRIDGECYCLE._serialized_start=176
-  _FRIDGECYCLE._serialized_end=189
-  _FRIDGEPARAMS._serialized_start=191
-  _FRIDGEPARAMS._serialized_end=253
+  _FRIDGE._serialized_end=175
+  _FRIDGEPARAMS._serialized_start=177
+  _FRIDGEPARAMS._serialized_end=239
 # @@protoc_insertion_point(module_scope)

@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>{{ message_name }}</h2>
+
+<!-- Breadcrumb navigation -->
+<nav>
+    <a href="/">Home</a>
+    {% for breadcrumb, path in breadcrumbs %}
+        &gt; <a href="{{ path }}">{{ breadcrumb }}</a>
+    {% endfor %}
+</nav>
+
+<!-- Table of fields -->
+<table>
+    <thead>
+        <tr>
+            <th>Field</th>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for field in fields %}
+        <tr>
+            <td>{{ field.name }}</td>
+            <td>{{ field.type }}</td>
+            <td>{{ field.meta_description }}</td>
+            <td>
+                {% if field.is_message %}
+                <a href="/nested{{ full_path }}/{{ field.name }}">View</a>
+                {% else %}
+                <input type="number" onchange="updateField('{{ full_path }}/{{ field.name }}', this.value)">
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
