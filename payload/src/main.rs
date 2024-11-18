@@ -83,7 +83,7 @@ fn main() {
                     fridge_command.encode(&mut buf).unwrap();
                     recv_tx.send(buf).unwrap();
                 }
-                // this redistribution can be proc_macro generated if we want. 
+                // this redistribution can be proc_macro generated if we want.
                 //but we might want fine grained control
 
                 //dunno the logic of the payload - we probably dont want the callback to be doing work but who knows
@@ -99,7 +99,7 @@ fn main() {
 fn internal_task(state: state::StateInternal) -> state::StateInternal {
     println!(
         "I am the internal task, and this is the param {}",
-        state.param1
+        state.param1.unwrap()
     );
 
     state::StateInternal { ..state }
