@@ -29,9 +29,11 @@
             <td>{{ field.meta_description }}</td>
             <td>
                 {% if field.is_message %}
-                <a href="/nested{{ full_path }}/{{ field.name }}">View</a>
+                <a href="/nested/{{ full_path }}{{ field.name }}">View</a>
+                {% elif field.is_empty%}
+                <button onclick="updateField('{{ full_path }}{{ field.name }}', 0)">Set</button>
                 {% else %}
-                <input type="number" onchange="updateField('{{ full_path }}/{{ field.name }}', this.value)">
+                <input type="number" onchange="updateField('{{ full_path }}{{ field.name }}', this.value)">
                 {% endif %}
             </td>
         </tr>
