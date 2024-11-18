@@ -11,18 +11,30 @@ from google.protobuf import symbol_database as _symbol_database
 _sym_db = _symbol_database.Default()
 
 
+from meta import meta_pb2 as meta_dot_meta__pb2
 from google.protobuf import empty_pb2 as google_dot_protobuf_dot_empty__pb2
+from validate import validate_pb2 as validate_dot_validate__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0esubstate.proto\x12\x08substate\x1a\x1bgoogle/protobuf/empty.proto\"W\n\x06\x46ridge\x12&\n\x06params\x18\x01 \x01(\x0b\x32\x16.substate.FridgeParams\x12%\n\x05\x63ycle\x18\x02 \x01(\x0b\x32\x16.google.protobuf.Empty\">\n\x0c\x46ridgeParams\x12\x0e\n\x06\x64\x65lay1\x18\x01 \x01(\r\x12\x0e\n\x06\x64\x65lay2\x18\x02 \x01(\r\x12\x0e\n\x06\x64\x65lay3\x18\x03 \x01(\r')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0esubstate.proto\x12\x08substate\x1a\x0fmeta/meta.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x17validate/validate.proto\"\xa6\x01\n\x06\x46ridge\x12V\n\x06params\x18\x01 \x01(\x0b\x32\x16.substate.FridgeParamsB.\xe2\xa1\'*\n\x06params\x12 The cycle parameters are in here\x12\x44\n\x05\x63ycle\x18\x02 \x01(\x0b\x32\x16.google.protobuf.EmptyB\x1d\xe2\xa1\'\x19\n\x05\x63ycle\x12\x10\x43ycle the fridge\"\xd7\x01\n\x0c\x46ridgeParams\x12\x41\n\x06\x64\x65lay1\x18\x01 \x01(\rB1\xfa\x42\x04*\x02\x18\n\xe2\xa1\'&\n\x05hello\x12\x1d\x44\x65lay for first part of cycle\x12\x41\n\x06\x64\x65lay2\x18\x02 \x01(\rB1\xfa\x42\x04*\x02\x18\n\xe2\xa1\'&\n\x05hello\x12\x1d\x44\x65lay for first part of cycle\x12\x41\n\x06\x64\x65lay3\x18\x03 \x01(\rB1\xfa\x42\x04*\x02\x18\n\xe2\xa1\'&\n\x05hello\x12\x1d\x44\x65lay for first part of cycle')
 
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, globals())
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'substate_pb2', globals())
 if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
-  _FRIDGE._serialized_start=57
-  _FRIDGE._serialized_end=144
-  _FRIDGEPARAMS._serialized_start=146
-  _FRIDGEPARAMS._serialized_end=208
+  _FRIDGE.fields_by_name['params']._options = None
+  _FRIDGE.fields_by_name['params']._serialized_options = b'\342\241\'*\n\006params\022 The cycle parameters are in here'
+  _FRIDGE.fields_by_name['cycle']._options = None
+  _FRIDGE.fields_by_name['cycle']._serialized_options = b'\342\241\'\031\n\005cycle\022\020Cycle the fridge'
+  _FRIDGEPARAMS.fields_by_name['delay1']._options = None
+  _FRIDGEPARAMS.fields_by_name['delay1']._serialized_options = b'\372B\004*\002\030\n\342\241\'&\n\005hello\022\035Delay for first part of cycle'
+  _FRIDGEPARAMS.fields_by_name['delay2']._options = None
+  _FRIDGEPARAMS.fields_by_name['delay2']._serialized_options = b'\372B\004*\002\030\n\342\241\'&\n\005hello\022\035Delay for first part of cycle'
+  _FRIDGEPARAMS.fields_by_name['delay3']._options = None
+  _FRIDGEPARAMS.fields_by_name['delay3']._serialized_options = b'\372B\004*\002\030\n\342\241\'&\n\005hello\022\035Delay for first part of cycle'
+  _FRIDGE._serialized_start=100
+  _FRIDGE._serialized_end=266
+  _FRIDGEPARAMS._serialized_start=269
+  _FRIDGEPARAMS._serialized_end=484
 # @@protoc_insertion_point(module_scope)
