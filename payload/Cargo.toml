@@ -11,6 +11,7 @@ edition = "2021"
 prost = "0.13.3"
 prost-validate = { version = "0.2.6", features = ["derive"] }
 dif-print = { path = "../dif-print" }
+prost-reflect = { version = "0.14.2", features = ["derive"] }
 # prost-metadata = { path = "../prost-metadata" }
 # prost-metadata-macro = { path = "../prost-metadata-macro" }
 
@@ -18,5 +19,6 @@ dif-print = { path = "../dif-print" }
 [build-dependencies]
 # capnpc = "0.20"
 prost-build = "0.13.3"
+prost-reflect-build = "0.14.0"
 prost-validate-build = "0.2.6"
 # prost-metadata-build = {path = "../prost-metadata-build"}

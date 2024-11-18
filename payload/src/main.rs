@@ -14,6 +14,9 @@ mod substate {
     include!(concat!(env!("OUT_DIR"), "/substate.rs"));
 }
 
+const FILE_DESCRIPTOR_SET_BYTES: &'static [u8] =
+    include_bytes!(concat!(env!("OUT_DIR"), "/file_descriptor_set.bin"));
+
 mod rich_defaults;
 use rich_defaults::DefaultRich;
 

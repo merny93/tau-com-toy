@@ -269,6 +269,8 @@ dependencies = [
  "dif-print",
  "prost",
  "prost-build",
+ "prost-reflect",
+ "prost-reflect-build",
  "prost-validate",
  "prost-validate-build",
 ]
