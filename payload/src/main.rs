@@ -1,3 +1,4 @@
+use core::str;
 use prost::{self, Message};
 use prost_validate::{self, Validator};
 use std::fs;
@@ -14,7 +15,7 @@ mod substate {
     include!(concat!(env!("OUT_DIR"), "/substate.rs"));
 }
 
-const FILE_DESCRIPTOR_SET_BYTES: &'static [u8] =
+const FILE_DESCRIPTOR_SET_BYTES: &[u8] =
     include_bytes!(concat!(env!("OUT_DIR"), "/file_descriptor_set.bin"));
 
 mod rich_defaults;
@@ -32,6 +33,10 @@ fn main() {
     let (req_tx, req_rx) = std::sync::mpsc::channel();
     let _fridge_thread = thread::spawn(move || {
         fridge::run(recv_rx, req_rx, send_tx);
+    });
+
+    let _info_thread = thread::spawn(move || {
+        run_info_interface();
     });
 
     //we can grab the state from the fridge - doing it with channels is silly
@@ -106,4 +111,34 @@ fn internal_task(state: state::StateInternal) -> state::StateInternal {
     );
 
     state::StateInternal { ..state }
+}
+
+// this could be implemented better, just a quick and dirty demo
+fn run_info_interface() {
+    let info_socket_path: &str = "../info_socket";
+    if fs::metadata(info_socket_path).is_ok() {
+        fs::remove_file(info_socket_path).unwrap();
+    }
+    let listener = UnixListener::bind(info_socket_path).unwrap();
+    for stream in listener.incoming() {
+        match stream {
+            Ok(mut stream) => {
+                let mut buf = Vec::new();
+                stream.read_to_end(&mut buf).unwrap();
+
+                // This could probably have a protobuf interface, but I don't know the types
+                // use strings for now
+                let buf_str = str::from_utf8(&buf).unwrap();
+
+                println!("recieved info request: {:?}", buf_str);
+
+                if buf_str == "GetFileDescriptorSet" {
+                    stream.write_all(FILE_DESCRIPTOR_SET_BYTES).unwrap();
+                }
+            }
+            Err(err) => {
+                eprintln!("Error accepting connection: {}", err);
+            }
+        }
+    }
 }

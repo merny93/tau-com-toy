@@ -16,9 +16,4 @@ fn main() {
     prost_validate_build::Builder::new()
         .compile_protos_with_config(config, &proto_files, &includes)
         .unwrap();
-
-    prost_reflect_build::Builder::new()
-        .file_descriptor_set_bytes("crate::FILE_DESCRIPTOR_SET_BYTES")
-        .compile_protos(&proto_files, &includes)
-        .unwrap();
 }
