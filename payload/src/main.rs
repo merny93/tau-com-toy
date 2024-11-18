@@ -133,7 +133,9 @@ fn run_info_interface() {
                 println!("recieved info request: {:?}", buf_str);
 
                 if buf_str == "GetFileDescriptorSet" {
-                    stream.write_all(FILE_DESCRIPTOR_SET_BYTES).unwrap();
+                    // TODO probably want to sent length first, to know when done receiving
+                    // stream.write_all(FILE_DESCRIPTOR_SET_BYTES).unwrap();
+                    stream.write_all(b"Response").unwrap();
                 }
             }
             Err(err) => {
