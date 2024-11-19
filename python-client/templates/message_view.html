@@ -7,7 +7,7 @@
 <nav>
     <a href="/">Home</a>
     {% for breadcrumb, path in breadcrumbs %}
-        &gt; <a href="{{ path }}">{{ breadcrumb }}</a>
+    &gt; <a href="{{ path }}">{{ breadcrumb }}</a>
     {% endfor %}
 </nav>
 
@@ -19,6 +19,7 @@
             <th>Type</th>
             <th>Description</th>
             <th>Actions</th>
+            <th>Remove</th>
         </tr>
     </thead>
     <tbody>
@@ -35,6 +36,9 @@
                 {% else %}
                 <input type="number" onchange="updateField('{{ full_path }}{{ field.name }}', this.value)">
                 {% endif %}
+            </td>
+            <td>
+                <button onclick="removeField('{{ full_path }}{{ field.name }}')">Remove</button>
             </td>
         </tr>
         {% endfor %}

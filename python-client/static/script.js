@@ -66,3 +66,35 @@ function sendCommand(){
         alert('An error occurred while submitting the message');
     });
 }
+
+function removeField(fieldName) {
+    fetch('/remove', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ field_name: fieldName })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Clear the input field
+            const inputElement = document.querySelector(`[data-field-name="${fieldName}"]`);
+            if (inputElement) {
+                inputElement.value = '';
+            }
+            updateChangeLog(data.changes);
+        } else {
+            alert(data.error);
+        }
+    });
+}
+
+function setupBackButtonHandler() {
+    window.addEventListener('popstate', function(event) {
+        // Prevent default back behavior
+        event.preventDefault();
+        
+        // Get the current URL and reload it fresh
+        const currentUrl = window.location.href;
+        window.location.replace(currentUrl);
+    });
+}

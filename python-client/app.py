@@ -1,16 +1,79 @@
+"""
+compile into descriptors.pb
+protoc --descriptor_set_out=descriptors.pb -I=../ -I=../validate -I=../meta --include_imports --include_source_info ../state.proto
+
+we still need the meta so that needs to be compiled into meta_pb2.py
+protoc --python_out=. -I=../meta meta.proto
+"""
+
 from flask import Flask, render_template, request, jsonify
+from google.protobuf import descriptor_pb2
 from google.protobuf.descriptor import FieldDescriptor
 from google.protobuf.empty_pb2 import Empty
 from google.protobuf.json_format import MessageToDict
-import state_pb2  # Replace with your compiled protobuf files
-import meta.meta_pb2 as meta_pb2
+from google.protobuf.descriptor_pool import DescriptorPool
+from google.protobuf.message_factory import GetMessageClass
+from google.protobuf.descriptor_pb2 import FileDescriptorSet
+
+# import the custom generated files
+try:
+    import pb2.meta_pb2 as meta_pb2  # custom generated - needs to be included with install (oh well)
+except ImportError:
+    print(
+        "Meta needs to be compiled using\nprotoc --python_out=pb2 -I=../meta ../meta/meta.proto "
+    )
+    raise ImportError
+try:
+    import pb2.validate_pb2 as validate_pb2  # custom generated - needs to be included with install (oh well)
+except ImportError:
+    print(
+        "Validate needs to be compiled using\nprotoc --python_out=pb2 -I=../validate ../validate/validate.proto"
+    )
+    raise ImportError
 from protoc_gen_validate.validator import ValidationFailed, validate_all
 import socket
+import os
 
 app = Flask(__name__)
 
-# In-memory change log
-message = state_pb2.State()
+# New globals for dynamic protocol buffers
+descriptor_pool = DescriptorPool()
+message = None  # Will be initialized after loading descriptors
+command_socket_path = None
+
+
+def initialize_protocol_buffers(descriptor_file_path, root_message_name, socket_path):
+    """Initialize protocol buffers from a descriptor file."""
+    global message, command_socket_path, descriptor_pool
+
+    try:
+        # Create a new descriptor pool
+        descriptor_pool = DescriptorPool()
+
+        # Load the descriptor set
+        with open(descriptor_file_path, "rb") as f:
+            descriptor_set = FileDescriptorSet()
+            descriptor_set.ParseFromString(f.read())
+
+        print("Loading descriptor files:")
+        for file_descriptor in descriptor_set.file:
+            print(f"- {file_descriptor.name}")
+            descriptor_pool.Add(file_descriptor)
+
+        # Debug: Print validation rules
+        message_descriptor = descriptor_pool.FindMessageTypeByName(root_message_name)
+
+        message_class = GetMessageClass(message_descriptor)
+        message = message_class()
+        command_socket_path = socket_path
+
+    except Exception as e:
+        print(f"Error initializing protocol buffers: {str(e)}")
+        print(
+            """You need to compile to descriptors.pb first
+            protoc --descriptor_set_out=descriptors.pb -I=../ -I=../validate -I=../meta --include_imports --include_source_info ../state.proto"""
+        )
+        raise
 
 
 def get_message_metadata(descriptor):
@@ -20,16 +83,16 @@ def get_message_metadata(descriptor):
         1: "float",  # TYPE_DOUBLE
         2: "float",  # TYPE_FLOAT
         3: "int",  # TYPE_INT64
-        4: "int",  # TYPE_UINT64
+        4: "uint",  # TYPE_UINT64
         5: "int",  # TYPE_INT32
-        6: "int",  # TYPE_FIXED64
+        6: "uint",  # TYPE_FIXED64
         7: "int",  # TYPE_FIXED32
         8: "bool",  # TYPE_BOOL
         9: "str",  # TYPE_STRING
         10: "group",  # TYPE_GROUP (not commonly used)
         11: "message",  # TYPE_MESSAGE
         12: "bytes",  # TYPE_BYTES
-        13: "int",  # TYPE_UINT32
+        13: "uint",  # TYPE_UINT32
         14: "enum",  # TYPE_ENUM
         15: "int",  # TYPE_SFIXED32
         16: "int",  # TYPE_SFIXED64
@@ -78,7 +141,7 @@ def nested_view(field_path):
 
 def render_message_view(base_name, path_parts):
     # Traverse to the correct descriptor based on the path
-    descriptor = state_pb2.State.DESCRIPTOR
+    descriptor = message.DESCRIPTOR
     for part in path_parts:
         descriptor = descriptor.fields_by_name[part].message_type
 
@@ -102,7 +165,7 @@ def render_message_view(base_name, path_parts):
         changes=MessageToDict(
             message,
             preserving_proto_field_name=True,
-            descriptor_pool=state_pb2.DESCRIPTOR.pool,
+            descriptor_pool=descriptor_pool,
         ),
     )
 
@@ -115,7 +178,7 @@ def update_field():
     new_value = data["value"]
 
     try:
-        current_descriptor = state_pb2.State.DESCRIPTOR
+        current_descriptor = message.DESCRIPTOR
         current_message = message
 
         # Traverse the field path
@@ -196,7 +259,7 @@ def update_field():
                 "changes": MessageToDict(
                     message,
                     preserving_proto_field_name=True,
-                    descriptor_pool=state_pb2.DESCRIPTOR.pool,
+                    descriptor_pool=descriptor_pool,
                 ),
             }
         )
@@ -212,7 +275,7 @@ def submit_message():
     """Submit the message we have been building"""
     with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as s:
         try:
-            s.connect("../command_socket")
+            s.connect(command_socket_path)
         except Exception as e:
             return jsonify({"success": False, "error": str(e)}), 500
         try:
@@ -227,5 +290,55 @@ def submit_message():
         return jsonify({"success": True})
 
 
+@app.route("/remove", methods=["POST"])
+def remove_field():
+    """Handle field removal from the protobuf message."""
+    data = request.json
+    field_path = data["field_name"].split("/")  # Split hierarchical path
+    try:
+        current_message = message
+        message_stack = [(message, None, None)]  # [(message, parent, field_name)]
+
+        # Traverse to the target field, keeping track of the path
+        for part in field_path[:-1]:
+            if not current_message.HasField(part):
+                return jsonify({"success": True})  # Field already doesn't exist
+            current_message = getattr(current_message, part)
+            message_stack.append((current_message, message_stack[-1][0], part))
+
+        # Clear the final field
+        final_field = field_path[-1]
+        current_message.ClearField(final_field)
+
+        # Work backwards through the stack, clearing empty parent messages
+        for msg, parent, field_name in reversed(
+            message_stack[1:]
+        ):  # Skip the root message
+            if not any(msg.HasField(field) for field in msg.DESCRIPTOR.fields_by_name):
+                # Message is empty, clear it from its parent
+                parent.ClearField(field_name)
+
+        # Return the updated changes
+        return jsonify(
+            {
+                "success": True,
+                "changes": MessageToDict(
+                    message,
+                    preserving_proto_field_name=True,
+                    descriptor_pool=descriptor_pool,
+                ),
+            }
+        )
+
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
 if __name__ == "__main__":
+    # Hard-coded configuration
+    descriptor_file = "pb2/descriptors.pb"
+    root_message = "state.State"
+    socket_path = "../command_socket"
+
+    initialize_protocol_buffers(descriptor_file, root_message, socket_path)
     app.run(debug=True)

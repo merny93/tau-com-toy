@@ -47,3 +47,17 @@ footer {
 .submit-button:hover {
     background-color: #45a049;
 }
+
+.remove-btn {
+    background: none;
+    border: none;
+    color: red;
+    font-size: 1.2em;
+    cursor: pointer;
+    padding: 0 5px;
+    vertical-align: middle;
+}
+
+.remove-btn:hover {
+    color: darkred;
+}
