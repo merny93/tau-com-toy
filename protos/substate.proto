@@ -1,8 +1,8 @@
 syntax = "proto2";
 package substate;
-import "meta/meta.proto";
+import "include/meta.proto";
 import "google/protobuf/empty.proto";
-import "validate/validate.proto";
+import "include/validate.proto";
 
 message Fridge {
   optional FridgeParams params = 1 [(meta.field_data) = {name: "params", description: "The cycle parameters are in here"}];

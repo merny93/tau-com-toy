@@ -1,7 +1,7 @@
 syntax = "proto2";
 package state;
-import "validate/validate.proto";
-import "meta/meta.proto";
+import "include/validate.proto";
+import "include/meta.proto";
 import "substate.proto";
 
 message State {

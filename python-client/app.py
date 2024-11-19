@@ -18,18 +18,18 @@ from google.protobuf.descriptor_pb2 import FileDescriptorSet
 # import the custom generated files
 try:
     import pb2.meta_pb2 as meta_pb2  # custom generated - needs to be included with install (oh well)
-except ImportError:
+except ModuleNotFoundError:
     print(
-        "Meta needs to be compiled using\nprotoc --python_out=pb2 -I=../meta ../meta/meta.proto "
+        "Meta needs to be compiled using\nprotoc --python_out=pb2 -I=../protos/include ../protos/include/meta.proto ../protos/include/validate.proto "
     )
-    raise ImportError
+    raise ModuleNotFoundError
 try:
     import pb2.validate_pb2 as validate_pb2  # custom generated - needs to be included with install (oh well)
-except ImportError:
+except ModuleNotFoundError:
     print(
-        "Validate needs to be compiled using\nprotoc --python_out=pb2 -I=../validate ../validate/validate.proto"
+        "Validate needs to be compiled using\nprotoc --python_out=pb2 -I=../protos/include ../protos/include/meta.proto ../protos/include/validate.proto"
     )
-    raise ImportError
+    raise ModuleNotFoundError
 from protoc_gen_validate.validator import ValidationFailed, validate_all
 import socket
 import os
@@ -71,7 +71,7 @@ def initialize_protocol_buffers(descriptor_file_path, root_message_name, socket_
         print(f"Error initializing protocol buffers: {str(e)}")
         print(
             """You need to compile to descriptors.pb first
-            protoc --descriptor_set_out=descriptors.pb -I=../ -I=../validate -I=../meta --include_imports --include_source_info ../state.proto"""
+            protoc --descriptor_set_out=pb2/descriptors.pb -I=../protos -I=../protos/include --include_imports --include_source_info ../protos/state.proto"""
         )
         raise
 

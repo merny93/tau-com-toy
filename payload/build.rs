@@ -4,9 +4,9 @@ use std::env;
 use std::path::Path;
 
 fn main() {
-    let proto_file = "../state.proto";
-    let includes = vec!["../", "../validate"];
-    println!("cargo:rerun-if-changed=../*.proto");
+    let proto_file = "../protos/state.proto";
+    let includes = vec!["../protos", "../protos/include"];
+    println!("cargo:rerun-if-changed=../protos");
 
     let mut config = prost_build::Config::new();
 
