@@ -10,7 +10,11 @@ This is a simple toy example showing the basic implementation of "protobuf is st
 
 The rust side requires a valid `protoc` installation which can be done with `apt install protobuf-compiler`. Running `protoc --version` should return `>3.0.0`. All other requirements are cargo and will automagically be installed with `cargo build`
 
-On the python side you will need a reasonably modern verion of python and a few `pip` packages: `pip install protobuf protoc-gen-validate flask`. I have commiteded the message descriptors to the github repo - no compiling (codegen) on the python side.
+On the python side you will need a reasonably modern verion of python and a few `pip` packages: `pip install protobuf protoc-gen-validate flask`. You will need to turn the extensions into python source files and the `.proto` definitions into a descriptor with `protoc` from within the `python-client` folder.
+```bash
+protoc --python_out=pb2 -I=../protos/include ../protos/include/meta.proto ../protos/include/validate.proto
+protoc --descriptor_set_out=pb2/descriptors.pb -I=../protos -I=../protos/include --include_imports --include_source_info ../protos/state.proto
+```
 
 ### Run
 
@@ -45,7 +49,7 @@ In this architecture a command is nothing but a partial state which can be effic
 ## Barth's list
 
 - Compatible with `<cmd> <params>` style command    
- - Ish? The command structure is much more rich. its more like `<parent>/<tr...ee>/<child> --<named param> <value> --<named param> <value> --<named param> <value>`
+  - Ish? The command structure is much more rich. its more like `<parent>/<tr...ee>/<child> --<named param> <value> --<named param> <value> --<named param> <value>`
 - Supports optional/named commands
   - Yes: optional is a pattern of protobuf and rich names (metadata in general) are implement as `options`
 - Ease of Rust integration: clients
