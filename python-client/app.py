@@ -15,6 +15,8 @@ from google.protobuf.descriptor_pool import DescriptorPool
 from google.protobuf.message_factory import GetMessageClass
 from google.protobuf.descriptor_pb2 import FileDescriptorSet
 
+from get_file_descriptor_set import get_file_descriptor_set
+
 # import the custom generated files
 try:
     import pb2.meta_pb2 as meta_pb2  # custom generated - needs to be included with install (oh well)
@@ -42,7 +44,7 @@ message = None  # Will be initialized after loading descriptors
 command_socket_path = None
 
 
-def initialize_protocol_buffers(descriptor_file_path, root_message_name, socket_path):
+def initialize_protocol_buffers(descriptor_socket, root_message_name, socket_path):
     """Initialize protocol buffers from a descriptor file."""
     global message, command_socket_path, descriptor_pool
 
@@ -50,10 +52,8 @@ def initialize_protocol_buffers(descriptor_file_path, root_message_name, socket_
         # Create a new descriptor pool
         descriptor_pool = DescriptorPool()
 
-        # Load the descriptor set
-        with open(descriptor_file_path, "rb") as f:
-            descriptor_set = FileDescriptorSet()
-            descriptor_set.ParseFromString(f.read())
+        # Request the descriptor set from the payload binary (server)
+        descriptor_set = get_file_descriptor_set(descriptor_socket, messages=False)
 
         print("Loading descriptor files:")
         for file_descriptor in descriptor_set.file:
@@ -336,9 +336,9 @@ def remove_field():
 
 if __name__ == "__main__":
     # Hard-coded configuration
-    descriptor_file = "pb2/descriptors.pb"
+    descriptor_socket = "../info_socket"
     root_message = "state.State"
     socket_path = "../command_socket"
 
-    initialize_protocol_buffers(descriptor_file, root_message, socket_path)
+    initialize_protocol_buffers(descriptor_socket, root_message, socket_path)
     app.run(debug=True)
