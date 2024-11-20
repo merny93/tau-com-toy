@@ -1,0 +1,16 @@
+syntax = "proto2";
+package substate;
+import "include/meta.proto";
+import "google/protobuf/empty.proto";
+import "include/validate.proto";
+
+message Fridge {
+  optional FridgeParams params = 1 [(meta.field_data) = {name: "params", description: "The cycle parameters are in here"}];
+  optional google.protobuf.Empty cycle =2 [(meta.field_data) = {name: "cycle", description: "Cycle the fridge"}];
+}
+
+message FridgeParams {
+  optional uint32 delay1 = 1 [(validate.rules).uint32 = {lte: 10}, (meta.field_data) = {name: "hello", description: "Delay for first part of cycle"}];
+  optional uint32 delay2 = 2 [(validate.rules).uint32 = {lte: 10}, (meta.field_data) = {name: "hello", description: "Delay for first part of cycle"}];
+  optional uint32 delay3 = 3 [(validate.rules).uint32 = {lte: 10}, (meta.field_data) = {name: "hello", description: "Delay for first part of cycle"}];
+}

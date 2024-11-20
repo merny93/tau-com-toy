@@ -1,12 +1,12 @@
 syntax = "proto2";
 package state;
-import "validate/validate.proto";
-import "meta/meta.proto";
+import "include/validate.proto";
+import "include/meta.proto";
 import "substate.proto";
 
 message State {
   optional StateInternal internal = 1;
-  optional substate.Fridge fridge = 2;
+  optional substate.Fridge fridge = 2 [(meta.field_data) = {name: "fridge", description: "The fridge"}];
   optional uint32 global_param = 3;
 }
 

@@ -31,3 +31,33 @@ footer {
     background: #e4e4e4;
     padding: 10px;
 }
+
+.submit-button {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.submit-button:hover {
+    background-color: #45a049;
+}
+
+.remove-btn {
+    background: none;
+    border: none;
+    color: red;
+    font-size: 1.2em;
+    cursor: pointer;
+    padding: 0 5px;
+    vertical-align: middle;
+}
+
+.remove-btn:hover {
+    color: darkred;
+}

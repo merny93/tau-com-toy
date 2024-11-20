@@ -1,0 +1,56 @@
+name: Rust Build with Protoc
+
+on:
+  push:
+    branches:
+      - main  # Trigger on push to the main branch
+  pull_request:
+    branches:
+      - main  # Trigger on pull requests to the main branch
+
+jobs:
+  build:
+    name: Build Project
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Install protoc
+      - name: Install protoc
+        run: sudo apt-get update && sudo apt-get install -y protobuf-compiler
+
+      # Set up Rust
+      - name: Set up Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable  # Specify the Rust toolchain version (e.g., stable, nightly)
+
+      # Cache dependencies
+      - name: Cache Cargo registry
+        uses: actions/cache@v3
+        with:
+          path: ~/.cargo/registry
+          key: ${{ runner.os }}-cargo-registry
+          restore-keys: |
+            ${{ runner.os }}-cargo-registry
+
+      - name: Cache Cargo build
+        uses: actions/cache@v3
+        with:
+          path: target
+          key: ${{ runner.os }}-cargo-build
+          restore-keys: |
+            ${{ runner.os }}-cargo-build
+
+      # Build the project
+      - name: Build the project
+        working-directory: ./payload
+        run: cargo build --verbose
+
+      # Run tests
+      - name: Run tests
+        working-directory: ./payload
+        run: cargo test --verbose

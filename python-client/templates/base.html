@@ -17,10 +17,11 @@
     <footer>
         <h2>Changed Fields</h2>
         <div id="change-log">
-            {% for field, value in changes.items() %}
-                <p>{{ field }}: {{ value }}</p>
-            {% endfor %}
         </div>
+        <button type="submit" class="submit-button" onclick="sendCommand()">Submit</button>
     </footer>
+    <script>
+        updateChangeLog({{ changes | tojson }});
+    </script>
 </body>
 </html>
