@@ -10,6 +10,8 @@ fn main() {
     let mut config = prost_build::Config::new();
 
     config.message_attribute(".", "#[derive(::dif_print::PrettyPrint)]");
+    // config.protoc_arg("--include_imports"); //this appear to already have been called as it gives an error "include_imports may only be passed once"
+    // config.protoc_arg("--include_source_info"); //this appear to already have been called as it gives an error "include_source_info may only be passed once"
     prost_validate_build::Builder::new()
         .compile_protos_with_config(config, &proto_files, &includes)
         .unwrap();

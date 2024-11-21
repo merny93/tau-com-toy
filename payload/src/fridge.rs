@@ -2,6 +2,7 @@ use std::sync::mpsc;
 
 use prost::Message;
 use prost_validate::Validator;
+use crate::PrettyPrint;
 
 use crate::rich_defaults::DefaultRich;
 

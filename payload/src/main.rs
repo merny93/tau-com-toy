@@ -10,6 +10,7 @@ use std::os::unix::net::{UnixListener, UnixStream};
 use std::process::exit;
 use std::thread;
 
+
 // use dif_print::PrettyPrint;
 mod state {
     include!(concat!(env!("OUT_DIR"), "/state.rs"));
@@ -21,6 +22,9 @@ mod substate {
 mod dynamic {
     include!(concat!(env!("OUT_DIR"), "/dynamic.rs"));
 }
+
+mod fmt;
+pub use fmt::PrettyPrint;
 
 const FILE_DESCRIPTOR_SET_BYTES: &[u8] =
     include_bytes!(concat!(env!("OUT_DIR"), "/file_descriptor_set.bin"));
