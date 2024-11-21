@@ -7,13 +7,13 @@ protoc --python_out=. -I=../meta meta.proto
 """
 
 from flask import Flask, render_template, request, jsonify
-from google.protobuf import descriptor_pb2
 from google.protobuf.descriptor import FieldDescriptor
 from google.protobuf.empty_pb2 import Empty
 from google.protobuf.json_format import MessageToDict
 from google.protobuf.descriptor_pool import DescriptorPool
-from google.protobuf.message_factory import GetMessageClass
-from google.protobuf.descriptor_pb2 import FileDescriptorSet
+from google.protobuf.message_factory import GetMessages
+
+from get_file_descriptor_set import get_file_descriptor_set
 
 # import the custom generated files
 try:
@@ -25,6 +25,7 @@ except ModuleNotFoundError:
     raise ModuleNotFoundError
 try:
     import pb2.validate_pb2 as validate_pb2  # custom generated - needs to be included with install (oh well)
+    #your linter may think this import is not needed but it does things to the globals without which things wont validate
 except ModuleNotFoundError:
     print(
         "Validate needs to be compiled using\nprotoc --python_out=pb2 -I=../protos/include ../protos/include/meta.proto ../protos/include/validate.proto"
@@ -32,7 +33,6 @@ except ModuleNotFoundError:
     raise ModuleNotFoundError
 from protoc_gen_validate.validator import ValidationFailed, validate_all
 import socket
-import os
 
 app = Flask(__name__)
 
@@ -42,7 +42,7 @@ message = None  # Will be initialized after loading descriptors
 command_socket_path = None
 
 
-def initialize_protocol_buffers(descriptor_file_path, root_message_name, socket_path):
+def initialize_protocol_buffers(descriptor_socket, root_message_name, socket_path):
     """Initialize protocol buffers from a descriptor file."""
     global message, command_socket_path, descriptor_pool
 
@@ -50,21 +50,15 @@ def initialize_protocol_buffers(descriptor_file_path, root_message_name, socket_
         # Create a new descriptor pool
         descriptor_pool = DescriptorPool()
 
-        # Load the descriptor set
-        with open(descriptor_file_path, "rb") as f:
-            descriptor_set = FileDescriptorSet()
-            descriptor_set.ParseFromString(f.read())
+        # Request the descriptor set from the payload binary (server)
+        descriptor_set = get_file_descriptor_set(descriptor_socket, messages=False)
 
         print("Loading descriptor files:")
         for file_descriptor in descriptor_set.file:
             print(f"- {file_descriptor.name}")
             descriptor_pool.Add(file_descriptor)
 
-        # Debug: Print validation rules
-        message_descriptor = descriptor_pool.FindMessageTypeByName(root_message_name)
-
-        message_class = GetMessageClass(message_descriptor)
-        message = message_class()
+        message = GetMessages(descriptor_set.file)[root_message_name]()
         command_socket_path = socket_path
 
     except Exception as e:
@@ -336,9 +330,9 @@ def remove_field():
 
 if __name__ == "__main__":
     # Hard-coded configuration
-    descriptor_file = "pb2/descriptors.pb"
+    descriptor_socket = "../info_socket"
     root_message = "state.State"
     socket_path = "../command_socket"
 
-    initialize_protocol_buffers(descriptor_file, root_message, socket_path)
+    initialize_protocol_buffers(descriptor_socket, root_message, socket_path)
     app.run(debug=True)
