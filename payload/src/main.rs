@@ -1,15 +1,15 @@
 use core::str;
 use once_cell::sync::Lazy;
 use prost::{self, Message};
-use prost_reflect::{DescriptorPool, ReflectMessage};
+use prost_reflect::{DescriptorPool, Kind, ReflectMessage};
 use prost_validate::{self, Validator};
+use std::any::Any;
 use std::fs;
 use std::io::prelude::*;
 use std::io::{Read, Write};
 use std::os::unix::net::{UnixListener, UnixStream};
 use std::process::exit;
 use std::thread;
-
 
 // use dif_print::PrettyPrint;
 mod state {
@@ -52,18 +52,42 @@ fn main() {
         .unwrap();
 
     // let hk_descriptor = DESCRIPTOR_POOL.get_message_by_name("meta.Meta").unwrap();
-    let hk_extension = DESCRIPTOR_POOL.get_extension_by_name("hk.channel_options").unwrap();
+    let hk_extension = DESCRIPTOR_POOL
+        .get_extension_by_name("hk.channel_options")
+        .unwrap();
+
+    let rtd_descriptor = DESCRIPTOR_POOL
+        .get_message_by_name("dynamic.RtdChannel")
+        .unwrap();
+    let diode_descriptor = DESCRIPTOR_POOL
+        .get_message_by_name("dynamic.DiodeChannel")
+        .unwrap();
     for fields in message.fields() {
-        
         let options = fields.options();
+        let message_type = fields.kind();
+        match message_type {
+            Kind::Message(msg) => {
+                if msg == rtd_descriptor {
+                    println!("rtd message");
+                } else if msg == diode_descriptor {
+                    println!("diode message");
+                    
+                }
+            }
+            _ => {}
+        }
+        // println!("options {:?}", fields.kind());
         let meta_extension = options.get_extension(&hk_extension);
         let meta_extension = meta_extension.as_message().unwrap();
-        println!("{}", meta_extension.get_field_by_name("channel_number").unwrap());
+        println!(
+            "channel number: {}, card_position: {}",
+            meta_extension.get_field_by_name("channel_number").unwrap(),
+            meta_extension.get_field_by_name("card_position").unwrap()
+        );
         // panic!("stop");
-        
     }
     // println!("message {:?}", message.extensions());
-    
+
     //initalize to rich defaults - either monolithic or distributed
     let mut actual = state::State::default_rich();
 
