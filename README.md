@@ -10,10 +10,18 @@ This is a simple toy example showing the basic implementation of "protobuf is st
 
 The rust side requires a valid `protoc` installation which can be done with `apt install protobuf-compiler`. Running `protoc --version` should return `>3.0.0`. All other requirements are cargo and will automagically be installed with `cargo build`
 
-On the python side you will need a reasonably modern verion of python and a few `pip` packages: `pip install protobuf protoc-gen-validate flask`. You will need to turn the extensions into python source files and the `.proto` definitions into a descriptor with `protoc` from within the `python-client` folder.
+On the python side you will need a reasonably modern verion of python and a few `pip` packages:
+- Python `protobuf` package:  I would strongly recommend installing with `apt` using: `apt install python3-protobuf` as the version needs to match your system `protoc` install. Using `apt` for both guarantees this.
+- The rest can be done with `pip` in a `venv` from inside the `python-client` folder as follows:
+```bash
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
+  
+You will need to turn the `.proto` extensions into python source files with `protoc` from within the `python-client` folder:
 ```bash
 protoc --python_out=pb2 -I=../protos/include ../protos/include/meta.proto ../protos/include/validate.proto
-protoc --descriptor_set_out=pb2/descriptors.pb -I=../protos -I=../protos/include --include_imports --include_source_info ../protos/state.proto
 ```
 
 ### Run

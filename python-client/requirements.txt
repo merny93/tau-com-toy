@@ -1,3 +1,10 @@
+#Flask for the web server
 Flask
+
+# validation of protoc.
 protoc-gen-validate
-protobuf == 3.20.*
+
+
+# you need the python protobuf library
+# but it needs to match your protoc version. So install with
+# apt install python3-protobuf !!! DO NOT USE PIP UNLESS YOU KNOW WHAT YOU ARE DOING
