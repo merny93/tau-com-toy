@@ -7,13 +7,11 @@ protoc --python_out=. -I=../meta meta.proto
 """
 
 from flask import Flask, render_template, request, jsonify
-from google.protobuf import descriptor_pb2
 from google.protobuf.descriptor import FieldDescriptor
 from google.protobuf.empty_pb2 import Empty
 from google.protobuf.json_format import MessageToDict
 from google.protobuf.descriptor_pool import DescriptorPool
-from google.protobuf.message_factory import GetMessageClass
-from google.protobuf.descriptor_pb2 import FileDescriptorSet
+from google.protobuf.message_factory import GetMessages
 
 from get_file_descriptor_set import get_file_descriptor_set
 
@@ -27,6 +25,7 @@ except ModuleNotFoundError:
     raise ModuleNotFoundError
 try:
     import pb2.validate_pb2 as validate_pb2  # custom generated - needs to be included with install (oh well)
+    #your linter may think this import is not needed but it does things to the globals without which things wont validate
 except ModuleNotFoundError:
     print(
         "Validate needs to be compiled using\nprotoc --python_out=pb2 -I=../protos/include ../protos/include/meta.proto ../protos/include/validate.proto"
@@ -34,7 +33,6 @@ except ModuleNotFoundError:
     raise ModuleNotFoundError
 from protoc_gen_validate.validator import ValidationFailed, validate_all
 import socket
-import os
 
 app = Flask(__name__)
 
@@ -60,11 +58,7 @@ def initialize_protocol_buffers(descriptor_socket, root_message_name, socket_pat
             print(f"- {file_descriptor.name}")
             descriptor_pool.Add(file_descriptor)
 
-        # Debug: Print validation rules
-        message_descriptor = descriptor_pool.FindMessageTypeByName(root_message_name)
-
-        message_class = GetMessageClass(message_descriptor)
-        message = message_class()
+        message = GetMessages(descriptor_set.file)[root_message_name]()
         command_socket_path = socket_path
 
     except Exception as e:
