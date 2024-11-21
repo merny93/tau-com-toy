@@ -1,0 +1,3 @@
+Flask
+protoc-gen-validate
+protobuf == 3.20.*
