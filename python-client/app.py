@@ -10,8 +10,6 @@ from flask import Flask, render_template, request, jsonify
 from google.protobuf.descriptor import FieldDescriptor
 from google.protobuf.empty_pb2 import Empty
 from google.protobuf.json_format import MessageToDict
-from google.protobuf.descriptor_pool import DescriptorPool
-from google.protobuf.message_factory import GetMessages
 
 from get_file_descriptor_set import get_file_descriptor_set
 
@@ -37,28 +35,20 @@ import socket
 app = Flask(__name__)
 
 # New globals for dynamic protocol buffers
-descriptor_pool = DescriptorPool()
 message = None  # Will be initialized after loading descriptors
 command_socket_path = None
 
 
 def initialize_protocol_buffers(descriptor_socket, root_message_name, socket_path):
     """Initialize protocol buffers from a descriptor file."""
-    global message, command_socket_path, descriptor_pool
+    global message, command_socket_path
 
     try:
-        # Create a new descriptor pool
-        descriptor_pool = DescriptorPool()
 
         # Request the descriptor set from the payload binary (server)
-        descriptor_set = get_file_descriptor_set(descriptor_socket, messages=False)
+        messages = get_file_descriptor_set(descriptor_socket, messages=True)
 
-        print("Loading descriptor files:")
-        for file_descriptor in descriptor_set.file:
-            print(f"- {file_descriptor.name}")
-            descriptor_pool.Add(file_descriptor)
-
-        message = GetMessages(descriptor_set.file)[root_message_name]()
+        message = messages[root_message_name]()
         command_socket_path = socket_path
 
     except Exception as e:
@@ -159,7 +149,6 @@ def render_message_view(base_name, path_parts):
         changes=MessageToDict(
             message,
             preserving_proto_field_name=True,
-            descriptor_pool=descriptor_pool,
         ),
     )
 
@@ -253,7 +242,6 @@ def update_field():
                 "changes": MessageToDict(
                     message,
                     preserving_proto_field_name=True,
-                    descriptor_pool=descriptor_pool,
                 ),
             }
         )
@@ -319,7 +307,6 @@ def remove_field():
                 "changes": MessageToDict(
                     message,
                     preserving_proto_field_name=True,
-                    descriptor_pool=descriptor_pool,
                 ),
             }
         )
