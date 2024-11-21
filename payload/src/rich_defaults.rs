@@ -23,6 +23,7 @@ impl DefaultRich for crate::state::State {
             global_param: Some(33),
             internal: Some(crate::state::StateInternal { param1: Some(11) }),
             fridge: None, //distributed means that the parent need not know about the child
+            hk_system: None,
         }
     }
 }

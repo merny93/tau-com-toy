@@ -267,6 +267,7 @@ name = "payload"
 version = "0.1.0"
 dependencies = [
  "dif-print",
+ "once_cell",
  "prost",
  "prost-build",
  "prost-reflect",

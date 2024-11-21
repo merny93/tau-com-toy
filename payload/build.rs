@@ -1,8 +1,6 @@
 extern crate prost_build;
 extern crate prost_reflect_build;
 extern crate prost_validate_build;
-use std::env;
-use std::path::Path;
 
 fn main() {
     let proto_files = vec!["../protos/state.proto"];

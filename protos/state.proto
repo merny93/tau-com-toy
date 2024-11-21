@@ -3,11 +3,13 @@ package state;
 import "include/validate.proto";
 import "include/meta.proto";
 import "substate.proto";
+import "dynamic.proto";
 
 message State {
   optional StateInternal internal = 1;
   optional substate.Fridge fridge = 2 [(meta.field_data) = {name: "fridge", description: "The fridge"}];
   optional uint32 global_param = 3;
+  optional dynamic.HKsystem hk_system = 4;
 }
 
 message StateInternal {

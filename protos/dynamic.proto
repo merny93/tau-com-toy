@@ -1,0 +1,46 @@
+syntax = "proto2";
+package dynamic;
+import "include/meta.proto";
+// import "google/protobuf/empty.proto";
+import "include/validate.proto";
+import "include/hk.proto";
+
+
+message HKsystem{
+    optional RtdChannel rtd_1 = 1 [(meta.field_data) = {name: "rtd_1", description: "RTD 1"}, (hk.channel_options) = {channel_number: 1, card_position: 1}];
+    optional DiodeChannel diode_1 = 2 [(meta.field_data) = {name: "diode_1", description: "Diode 1"}, (hk.channel_options) = {channel_number: 1, card_position: 2}];
+    optional HeaterHighChannel heater_high = 3 [(meta.field_data) = {name: "heater_high", description: "Heater High"}, (hk.channel_options) = {channel_number: 1, card_position: 3, heater_default: Off}];
+    optional HeaterLowChannel heater_low = 4 [(meta.field_data) = {name: "heater_low", description: "Heater Low"}, (hk.channel_options) = {channel_number: 6, card_position: 1, heater_default: On}];
+}
+
+message RtdChannel {
+    oneof excitation {
+        uint32 logdac = 1 [(validate.rules).uint32 = {lte: 15}, (meta.field_data) = {name: "logdac", description: "The logdac"}];
+        uint32 uvolts = 2 [(validate.rules).uint32 = {lte: 1000}, (meta.field_data) = {name: "uvolts", description: "The uvolts"}];
+    }
+}
+
+message DiodeChannel {
+    optional DiodeChannel excitation = 1 [(meta.field_data) = {name: "excitation", description: "The excitation"}];
+}
+
+enum DiodeExcitation {
+    DC = 0;
+    AC = 1;
+    None = 2;
+}
+
+message HeaterRaw {
+    optional uint32 pwm = 1 [(validate.rules).uint32 = {lte: 4096}, (meta.field_data) = {name: "pwm", description: "The pwm"}];
+    optional uint32 dac = 2 [(validate.rules).uint32 = {lte: 4096}, (meta.field_data) = {name: "dac", description: "The dac"}];
+}
+
+message HeaterHighChannel{
+    optional uint32 mvolts = 1 [(validate.rules).uint32 = {lte: 50000}, (meta.field_data) = {name: "Output (mV)", description: "Output in mV"}];
+    optional HeaterRaw raw = 2 [(meta.field_data) = {name: "raw_heater", description: "be warned - raw channel exposed"}];
+}
+
+message HeaterLowChannel{
+    optional uint32 mvolts = 1 [(validate.rules).uint32 = {lte: 5000}, (meta.field_data) = {name: "Output (mV)", description: "Output in mV"}];
+    optional HeaterRaw raw = 2 [(meta.field_data) = {name: "raw_heater", description: "be warned - raw channel exposed"}];
+}

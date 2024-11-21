@@ -1,0 +1,21 @@
+syntax = "proto2";
+package hk;
+
+
+import "google/protobuf/descriptor.proto";
+
+message ChannelOptions {
+    optional uint32 card_position = 1;
+    optional uint32 channel_number = 2;
+    optional HeaterDefault heater_default = 3;
+}
+
+enum HeaterDefault {
+    Off = 0;
+    On = 1;
+}
+
+
+extend google.protobuf.FieldOptions {
+  optional ChannelOptions channel_options = 80413; // increment untill no collision lel
+}

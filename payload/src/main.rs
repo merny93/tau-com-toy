@@ -1,11 +1,13 @@
 use core::str;
+use once_cell::sync::Lazy;
 use prost::{self, Message};
+use prost_reflect::{DescriptorPool, ReflectMessage};
 use prost_validate::{self, Validator};
 use std::fs;
 use std::io::prelude::*;
 use std::io::{Read, Write};
 use std::os::unix::net::{UnixListener, UnixStream};
-use std::sync::{Arc, Barrier};
+use std::process::exit;
 use std::thread;
 
 // use dif_print::PrettyPrint;
@@ -16,8 +18,23 @@ mod substate {
     include!(concat!(env!("OUT_DIR"), "/substate.rs"));
 }
 
+mod dynamic {
+    include!(concat!(env!("OUT_DIR"), "/dynamic.rs"));
+}
+
 const FILE_DESCRIPTOR_SET_BYTES: &[u8] =
     include_bytes!(concat!(env!("OUT_DIR"), "/file_descriptor_set.bin"));
+
+static DESCRIPTOR_POOL: Lazy<DescriptorPool> = Lazy::new(|| {
+    DescriptorPool::decode(
+        include_bytes!(concat!(env!("OUT_DIR"), "/file_descriptor_set.bin")).as_ref(),
+    )
+    .unwrap()
+});
+
+#[derive(Message, ReflectMessage)]
+#[prost_reflect(descriptor_pool = "DESCRIPTOR_POOL", message_name = "dynamic.HKsystem")]
+pub struct HkSystem {}
 
 mod rich_defaults;
 use rich_defaults::DefaultRich;
@@ -25,6 +42,24 @@ use rich_defaults::DefaultRich;
 mod fridge;
 
 fn main() {
+    // println!("derived_message {:?}", HkSystem{}.descriptor());
+    let message = DESCRIPTOR_POOL
+        .get_message_by_name("dynamic.HKsystem")
+        .unwrap();
+
+    // let hk_descriptor = DESCRIPTOR_POOL.get_message_by_name("meta.Meta").unwrap();
+    let hk_extension = DESCRIPTOR_POOL.get_extension_by_name("hk.channel_options").unwrap();
+    for fields in message.fields() {
+        
+        let options = fields.options();
+        let meta_extension = options.get_extension(&hk_extension);
+        let meta_extension = meta_extension.as_message().unwrap();
+        println!("{}", meta_extension.get_field_by_name("channel_number").unwrap());
+        // panic!("stop");
+        
+    }
+    // println!("message {:?}", message.extensions());
+    
     //initalize to rich defaults - either monolithic or distributed
     let mut actual = state::State::default_rich();
 
