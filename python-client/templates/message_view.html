@@ -33,6 +33,12 @@
                 <a href="/nested/{{ full_path }}{{ field.name }}">View</a>
                 {% elif field.is_empty%}
                 <button onclick="updateField('{{ full_path }}{{ field.name }}', 0)">Set</button>
+                {% elif field.is_enum %}
+                    <select onchange="updateField('{{ full_path }}{{ field.name }}', this.value)">
+                        {% for key, value in field.enum_values.items() %}
+                            <option value="{{ value }}">{{ key }}</option>
+                        {% endfor %}
+                    </select>
                 {% else %}
                 <input type="number" onchange="updateField('{{ full_path }}{{ field.name }}', this.value)">
                 {% endif %}

@@ -91,10 +91,20 @@ def get_message_metadata(descriptor):
             is_message and field.message_type.full_name == Empty.DESCRIPTOR.full_name
         )
 
+        is_enum = field.type == FieldDescriptor.TYPE_ENUM
+        if is_enum:
+            enum_values = {
+                value.name: value.number for value in field.enum_type.values
+            }
+        else:
+            enum_values = []
+
         meta = {
             "name": field.name,
             "type": "empty" if is_empty else typemap[field.type],
-            "is_message": False if is_empty else is_message,
+            "is_message": False if is_empty or is_enum else is_message,
+            "is_enum": is_enum,
+            "enum_values": enum_values,
             "is_empty": is_empty,  # Add a flag to indicate Empty type
             "meta_name": field.GetOptions().Extensions[meta_pb2.field_data].name,
             "meta_description": field.GetOptions()
@@ -218,6 +228,11 @@ def update_field():
         ):
             # Handle `google.protobuf.Empty`
             getattr(current_message, final_field_name).SetInParent()
+        elif final_field.type == final_field.TYPE_ENUM:
+            print(new_value)
+            print(final_field)
+            print(final_field_name)
+            setattr(current_message, final_field_name, int(new_value))
         else:
             return (
                 jsonify(

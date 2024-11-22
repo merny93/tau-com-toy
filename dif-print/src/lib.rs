@@ -20,7 +20,7 @@ pub fn pretty_print(input: TokenStream) -> TokenStream {
                             if type_path.path.segments.last().unwrap().ident == "Option" {
                                 return quote! {
                                     if let Some(ref value) = self.#field_name {
-                                        result.push_str(&format!("{}: {:?}, ", #field_string, value));
+                                        result.push_str(&format!("{}: {}, ", #field_string, value.pretty_print()));
                                     }
                                 };
                             }
@@ -28,7 +28,7 @@ pub fn pretty_print(input: TokenStream) -> TokenStream {
 
                         // If not an Option, always include the field
                         quote! {
-                            result.push_str(&format!("{}: {:?}, ", #field_string, self.#field_name));
+                            result.push_str(&format!("{}: {}, ", #field_string, self.#field_name));
                         }
                     });
                     quote! {
@@ -39,8 +39,8 @@ pub fn pretty_print(input: TokenStream) -> TokenStream {
             };
 
             quote! {
-                impl #name {
-                    pub fn pretty_print(&self) -> String {
+                impl super::PrettyPrint for #name {
+                    fn pretty_print(&self) -> String {
                         let mut result = String::from("{ ");
                         #field_formatters
                         result.push_str("}");
@@ -53,6 +53,5 @@ pub fn pretty_print(input: TokenStream) -> TokenStream {
             compile_error!("PrettyPrint can only be derived for structs with named fields.");
         },
     };
-
     TokenStream::from(expanded)
 }

@@ -1,7 +1,7 @@
 use core::str;
 use once_cell::sync::Lazy;
 use prost::{self, Message};
-use prost_reflect::{DescriptorPool, Kind, ReflectMessage};
+use prost_reflect::{DescriptorPool, DynamicMessage, Kind, ReflectMessage};
 use prost_validate::{self, Validator};
 use std::any::Any;
 use std::fs;
@@ -20,7 +20,12 @@ mod substate {
 }
 
 mod dynamic {
+    use super::DESCRIPTOR_POOL;
     include!(concat!(env!("OUT_DIR"), "/dynamic.rs"));
+}
+
+mod hk {
+    include!(concat!(env!("OUT_DIR"), "/hk.rs"));
 }
 
 mod fmt;
@@ -35,10 +40,6 @@ static DESCRIPTOR_POOL: Lazy<DescriptorPool> = Lazy::new(|| {
     )
     .unwrap()
 });
-
-#[derive(Message, ReflectMessage)]
-#[prost_reflect(descriptor_pool = "DESCRIPTOR_POOL", message_name = "dynamic.HKsystem")]
-pub struct HkSystem {}
 
 mod rich_defaults;
 use rich_defaults::DefaultRich;
@@ -63,22 +64,35 @@ fn main() {
         .get_message_by_name("dynamic.DiodeChannel")
         .unwrap();
     for fields in message.fields() {
+        println!("field name is {}", fields.name());
         let options = fields.options();
         let message_type = fields.kind();
+        let meta_extension = options.get_extension(&hk_extension);
+        let meta_extension = meta_extension.as_message().unwrap();
         match message_type {
             Kind::Message(msg) => {
                 if msg == rtd_descriptor {
                     println!("rtd message");
                 } else if msg == diode_descriptor {
                     println!("diode message");
-                    
+                } else {
+                    println!(
+                        "{:?}",
+                        hk::HeaterDefault::try_from(
+                            meta_extension
+                                .get_field_by_name("heater_default")
+                                .unwrap()
+                                .as_enum_number()
+                                .unwrap()
+                        )
+                        .unwrap()
+                    );
                 }
             }
             _ => {}
         }
         // println!("options {:?}", fields.kind());
-        let meta_extension = options.get_extension(&hk_extension);
-        let meta_extension = meta_extension.as_message().unwrap();
+
         println!(
             "channel number: {}, card_position: {}",
             meta_extension.get_field_by_name("channel_number").unwrap(),
@@ -86,6 +100,34 @@ fn main() {
         );
         // panic!("stop");
     }
+    let system_descriptor = dynamic::HKsystem::default().descriptor();
+    let mut system = dynamic::HKsystem::default();
+    // system.diode_1 = Some(dynamic::DiodeChannel {
+    //     excitation: Some(dynamic::DiodeExcitation::Ac.into()),
+    // });
+    system.rtd_1 = Some(dynamic::RtdChannel {
+        excitation: Some(dynamic::rtd_channel::Excitation::Uvolts(1).into()),
+    });
+    let mut buf = Vec::new();
+    system.encode(&mut buf).unwrap();
+
+    let dynamic_message = DynamicMessage::decode(system_descriptor.clone(), &buf[..]).unwrap();
+    // println!("{:?}", dynamic_message.);
+    for (field, value) in dynamic_message.fields() {
+        println!("field name is {}", field.name());
+        println!("kind is {:?}", field.kind().as_message().unwrap().name());
+        let field_value = dynamic_message.get_field(&field);
+        let val = field_value.as_message().unwrap();
+        let res = val.has_field_by_name("logdac");
+        println!("{:?}", res);
+        // for (sub_field, sub_val) in val.fields(){
+        //     println!("{:?}", sub_val);
+        //     println!("{:?}", sub_field);
+        // }
+        // println!("{:?}", val);
+    }
+    // println!("{:?}", system);
+    // panic!("stop");
     // println!("message {:?}", message.extensions());
 
     //initalize to rich defaults - either monolithic or distributed

@@ -15,13 +15,13 @@ message HKsystem{
 
 message RtdChannel {
     oneof excitation {
-        uint32 logdac = 1 [(validate.rules).uint32 = {lte: 15}, (meta.field_data) = {name: "logdac", description: "The logdac"}];
-        uint32 uvolts = 2 [(validate.rules).uint32 = {lte: 1000}, (meta.field_data) = {name: "uvolts", description: "The uvolts"}];
+        uint32 logdac = 1 [(validate.rules).uint32 = {lte: 15}, (meta.field_data) = {name: "logdac", description: "Set the logdac directly"}];
+        uint32 uvolts = 2 [(validate.rules).uint32 = {lte: 1000}, (meta.field_data) = {name: "uvolts", description: "Let the agent do math and set excitation in uV"}];
     }
 }
 
 message DiodeChannel {
-    optional DiodeChannel excitation = 1 [(meta.field_data) = {name: "excitation", description: "The excitation"}];
+    optional DiodeExcitation excitation = 1 [(meta.field_data) = {name: "excitation", description: "The excitation"}];
 }
 
 enum DiodeExcitation {
@@ -31,8 +31,8 @@ enum DiodeExcitation {
 }
 
 message HeaterRaw {
-    optional uint32 pwm = 1 [(validate.rules).uint32 = {lte: 4096}, (meta.field_data) = {name: "pwm", description: "The pwm"}];
-    optional uint32 dac = 2 [(validate.rules).uint32 = {lte: 4096}, (meta.field_data) = {name: "dac", description: "The dac"}];
+    optional uint32 pwm = 1 [(validate.rules).uint32 = {lte: 4096}, (meta.field_data) = {name: "pwm", description: "pwm register value"}];
+    optional uint32 dac = 2 [(validate.rules).uint32 = {lte: 4096}, (meta.field_data) = {name: "dac", description: "dac register value"}];
 }
 
 message HeaterHighChannel{
