@@ -98,15 +98,20 @@ def get_message_metadata(descriptor):
             }
         else:
             enum_values = []
+        meta_name = field.GetOptions().Extensions[meta_pb2.field_data].name
+        if meta_name != "":
+            name = meta_name
+        else:
+            name = field.name
 
         meta = {
-            "name": field.name,
+            "name": name,
             "type": "empty" if is_empty else typemap[field.type],
             "is_message": False if is_empty or is_enum else is_message,
             "is_enum": is_enum,
             "enum_values": enum_values,
             "is_empty": is_empty,  # Add a flag to indicate Empty type
-            "meta_name": field.GetOptions().Extensions[meta_pb2.field_data].name,
+            "meta_name": meta_name,
             "meta_description": field.GetOptions()
             .Extensions[meta_pb2.field_data]
             .description,

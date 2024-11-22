@@ -7,7 +7,7 @@ import "include/hk.proto";
 
 
 message HKsystem{
-    optional RtdChannel rtd_1 = 1 [(meta.field_data) = {name: "rtd_1", description: "RTD 1"}, (hk.channel_options) = {channel_number: 1, card_position: 1}];
+    optional RtdChannel rtd_1 = 1 [(meta.field_data) = {name: "rtd 4k plate", description: "RTD 1"}, (hk.channel_options) = {channel_number: 1, card_position: 1}];
     optional DiodeChannel diode_1 = 2 [(meta.field_data) = {name: "diode_1", description: "Diode 1"}, (hk.channel_options) = {channel_number: 1, card_position: 2}];
     optional HeaterHighChannel heater_high = 3 [(meta.field_data) = {name: "heater_high", description: "Heater High"}, (hk.channel_options) = {channel_number: 1, card_position: 3, heater_default: Off}];
     optional HeaterLowChannel heater_low = 4 [(meta.field_data) = {name: "heater_low", description: "Heater Low"}, (hk.channel_options) = {channel_number: 6, card_position: 1, heater_default: On}];
