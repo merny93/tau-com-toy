@@ -1,5 +1,5 @@
 import typer
-from typing import Optional
+from typing import Optional, List
 from pathlib import Path
 import importlib
 from google.protobuf.descriptor import Descriptor, FieldDescriptor
@@ -223,7 +223,7 @@ def send(
         help=f"Full name of the protobuf message type (e.g., package.MessageType{DELIMITER}submessage{DELIMITER}subsubmessage)",
         autocompletion=complete_protobuf_full_name,
     ),
-    message_data: list[str] = typer.Argument(
+    message_data: List[str] = typer.Argument(
         None,
         help=f"Data for the message in field1{DELIMITER}Value1 field2{DELIMITER}Value2 ... format",
         autocompletion=complete_protobuf_field,
