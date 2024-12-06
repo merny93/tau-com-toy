@@ -1,0 +1,3 @@
+Try installing with `pip install --editable .` strongly recomend doing this inside a `venv`...
+
+This will put `taucommand` into your path and you can do `taucommand --install-completion` to get tab completions after a restart!
