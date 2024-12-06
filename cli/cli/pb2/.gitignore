@@ -1,3 +1,4 @@
 #ignore everything but itself
 *
 !.gitignore
+!__init__.py
