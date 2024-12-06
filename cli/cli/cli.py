@@ -16,18 +16,18 @@ COMMAND_SOCKET_PATH = "../command_socket"
 INFO_SOCKET_PATH = "../info_socket"
 DELIMITER = "@"
 # something is cursed about calling scripts with typer so here is the work around...
-import sys
-from pathlib import Path
+# import sys
+# from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).parent.resolve()))
-try:
-    import pb2.meta_pb2 as meta_pb2
-    import pb2.validate_pb2 as validate_pb2
-except:
-    print(
-        "you need to compile the protos first\nprotoc --python_out=pb2 -I=../protos/include ../protos/include/meta.proto ../protos/include/validate.proto"
-    )
-sys.path.pop(0)
+# sys.path.append(str(os.path.join(Path(__file__).parent.resolve(), "pb2")))
+# try:
+#     import validate_pb2 as validate_pb2
+# except:
+#     raise ImportError("you need to compile the protos first\nprotoc --python_out=pb2 -I=../protos/include ../protos/include/meta.proto ../protos/include/validate.proto")
+# sys.path.pop(0)
+
+from .pb2 import validate_pb2 as validate_pb2
+from .pb2 import meta_pb2 as meta_pb2
 
 
 typemap = {
