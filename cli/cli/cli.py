@@ -11,10 +11,12 @@ import socket
 import pickle
 import os
 import time
+import functools
 
 COMMAND_SOCKET_PATH = "../command_socket"
 INFO_SOCKET_PATH = "../info_socket"
 DELIMITER = "@"
+EQUALS = "@"
 # something is cursed about calling scripts with typer so here is the work around...
 # import sys
 # from pathlib import Path
@@ -28,7 +30,6 @@ DELIMITER = "@"
 
 from .pb2 import validate_pb2 as validate_pb2
 from .pb2 import meta_pb2 as meta_pb2
-
 
 typemap = {
     1: "float",  # TYPE_DOUBLE
@@ -56,11 +57,8 @@ from typing import Dict, Type
 
 app = typer.Typer(rich_markup_mode="rich")
 
-# Global registry to store message types
-message_registry = {}
-
-
-def load_proto_messages():
+@functools.lru_cache(maxsize=None)
+def get_proto_messages():
     """Load all protobuf message types from a given module."""
 
     # try to load from the cache. the cache is names .message_cached.pkl
@@ -97,71 +95,87 @@ def load_proto_messages():
     else:
         raise ValueError("Failed to parse FileDescriptorSet")
     res = message_factory.GetMessages(fd_set.file)
-    message_registry.update(res)
     if cached == False:
         with open(cache_file, "wb") as f:
             pickle.dump({"bytes": response, "time": time.time()}, f)
+    top_level_message = get_toplevel_message(res)
+    return res, top_level_message
 
+def get_toplevel_message(message_registry):
+    '''
+    Take the message registry and figure out which message is the top level by building a tree
+    '''
+    # build the tree
+    message_map = dict()
+    for message_name, message in message_registry.items():
+        if message_name.startswith("google.") or message_name.startswith("validate.") or message_name.startswith("meta."):
+            continue
+        # print("message name", message_name)
+        message_map[message_name] = set()
+        for field_descriptor in message().DESCRIPTOR.fields_by_name.values():
+            if field_descriptor.type != FieldDescriptor.TYPE_MESSAGE:
+                continue
+            # print(field_descriptor.message_type.full_name)
+            message_map[message_name].add(field_descriptor.message_type.full_name)
+    
+    @functools.lru_cache(maxsize=None)
+    def build_subtree(message_name):
+        if message_name not in message_map:
+            return 0
+        subtree = 0
+        for child in message_map[message_name]:
+            subtree += build_subtree(child)
+        return subtree + 1
 
-# Load all protobuf messages
-load_proto_messages()
+    messages = list(message_map.keys())
+    message_lengths = [build_subtree(message) for message in messages]
+    longest_message = messages[message_lengths.index(max(message_lengths))]
+    return longest_message
 
 
 def complete_protobuf_full_name(incomplete_name: str):
     # parse the incplete name
     # print("incomplete string", incomplete_name)
     message_path = incomplete_name.split(DELIMITER)
-    if len(message_path) == 1:
-        base_name = message_path[0]
-        # user has entered zero or more charachter of the base name
-        for key in message_registry.keys():
-            if key.startswith(base_name):
-                if (
-                    key.startswith("google")
-                    or key.startswith("validate")
-                    or key.startswith("meta")
-                ):
-                    continue
-                yield (key, "help")
-    elif len(message_path) > 1:
-        # print("hello")
-        # user has entered a full parent message name and has entered zero or more charachters of the child message name
-        base_name = message_path[0]
-        message = message_registry[base_name]()
-        current_descriptor = message.DESCRIPTOR
-        current_message = message
-        # travers the path up to the possibly incomlete last part
-        for part in message_path[1:-1]:
-            field = current_descriptor.fields_by_name.get(part)
-            if field is None or field.type != FieldDescriptor.TYPE_MESSAGE:
-                yield from []
-            current_message = getattr(current_message, part)
-            current_descriptor = field.message_type
-        # work on the last part
-        final_part = message_path[-1]
-        for key in current_descriptor.fields_by_name.keys():
-            if key.startswith(final_part):
-                field = current_descriptor.fields_by_name.get(key)
-                # only complete things that are messages
-                if field.type != FieldDescriptor.TYPE_MESSAGE:
-                    continue
-                # special case for empty
-                if field.message_type.full_name == Empty.DESCRIPTOR.full_name:
-                    continue
-                # assemble the full name to complete
-                yield (DELIMITER.join(message_path[:-1] + [key]), "help")
+    message_registry, toplevel_message = get_proto_messages()
+    # print("hello")
+    # user has entered a full parent message name and has entered zero or more charachters of the child message name
+    message = message_registry[toplevel_message]()
+    current_descriptor = message.DESCRIPTOR
+    current_message = message
+    # travers the path up to the possibly incomlete last part
+    for part in message_path[:-1]:
+        field = current_descriptor.fields_by_name.get(part)
+        if field is None or field.type != FieldDescriptor.TYPE_MESSAGE:
+            yield from []
+        current_message = getattr(current_message, part)
+        current_descriptor = field.message_type
+    # work on the last part
+    final_part = message_path[-1]
+    for key in current_descriptor.fields_by_name.keys():
+        if key.startswith(final_part):
+            field = current_descriptor.fields_by_name.get(key)
+            # only complete things that are messages
+            if field.type != FieldDescriptor.TYPE_MESSAGE:
+                continue
+            # special case for empty
+            if field.message_type.full_name == Empty.DESCRIPTOR.full_name:
+                continue
+            # assemble the full name to complete
+            yield (DELIMITER.join(message_path[:-1] + [key]), "help")
 
 
 def complete_protobuf_field(ctx: typer.Context, incomplete_fields: str):
-    # print ("incomplete", incomplete_fields)
+    # print ("incomplete", incomplete_fields, "ctx", ctx.params.get("message_data"))
     message_path = ctx.params["protobuf_full_name"].split(DELIMITER)
-    message = message_registry[message_path[0]]()
+    message_registry, toplevel_message = get_proto_messages()
+    message = message_registry[toplevel_message]()
 
     current_descriptor = message.DESCRIPTOR
     current_message = message
 
     # Traverse the field path
-    for part in message_path[1:]:
+    for part in message_path:
         field = current_descriptor.fields_by_name.get(part)
 
         # Ensure the field exists and is a message
@@ -175,14 +189,14 @@ def complete_protobuf_field(ctx: typer.Context, incomplete_fields: str):
         current_message = getattr(current_message, part)
         current_descriptor = field.message_type
 
-    field_parts = incomplete_fields.split(DELIMITER)
+    field_parts = incomplete_fields.split(EQUALS)
     if len(field_parts) == 1:
         partial_name = field_parts[0]
         # still working on the field
         for field_name in current_descriptor.fields_by_name.keys():
             # do not autocomplete already set fields!
             if field_name in map(
-                lambda x: x.split(DELIMITER)[0], ctx.params.get("message_data")
+                lambda x: x.split(EQUALS)[0], ctx.params.get("message_data")
             ):
                 continue
             # only autocomplete fields that match the start
@@ -197,7 +211,7 @@ def complete_protobuf_field(ctx: typer.Context, incomplete_fields: str):
                     continue
                 # append the possibly useful type?
                 # help doesnt work in bash...
-                yield (f"{field_name}{DELIMITER}{typemap[field.type]}", "test help")
+                yield (f"{field_name}{EQUALS}{typemap[field.type]}", "test help")
     elif len(field_parts) == 2:
 
         field = current_descriptor.fields_by_name.get(field_parts[0])
@@ -235,13 +249,14 @@ def send(
     Try using <tab> for autocompletion and use @ for delimiting strings
     """
     message_path = protobuf_full_name.split(DELIMITER)
-    message = message_registry[message_path[0]]()
+    message_registry, toplevel_message = get_proto_messages()
+    message = message_registry[toplevel_message]()
 
     current_descriptor = message.DESCRIPTOR
     current_message = message
 
     # Traverse the field path
-    for part in message_path[1:]:
+    for part in message_path:
         field = current_descriptor.fields_by_name.get(part)
 
         # Ensure the field exists and is a message
